@@ -1,0 +1,12 @@
+CREATE TABLE lora_registry (
+    id UUID PRIMARY KEY,
+    creator_id UUID,
+    model_hash TEXT UNIQUE,
+    trigger_words TEXT[],
+    revenue_share_percent NUMERIC DEFAULT 0.05
+);
+CREATE TABLE motion_modules (
+    id UUID PRIMARY KEY,
+    name TEXT,
+    compute_cost_estimate NUMERIC
+);
