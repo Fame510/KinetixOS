@@ -1,8 +1,7 @@
-# KinetixOS
+# KinetixOS: The Sovereign Cinema Engine
 
-Sovereign AI Cinema & Character Motion Generation Engine.
-
-## Architecture
-- Edge API Routes
-- In-Browser WebAssembly Acceleration
-- Stripe Revenue Provisioning
+A superior, zero-drift AI video generation platform.
+## Technical Moat
+- **Identity Consistency:** Latent-space tracking via `drift-correction.ts`.
+- **Edge Rendering:** WebGPU-accelerated interpolation in the browser.
+- **Monetization:** MCP-ready LoRA registry.
