@@ -1,0 +1,39 @@
+import React, { useState } from 'react';
+
+export default function App() {
+  const [pipelineStatus, setPipelineStatus] = useState<'idle' | 'executing' | 'ready'>('ready');
+  const [telemetry, setTelemetry] = useState({ requests: 1420, avgLatency: '0.42ms', costSavings: '$3,840' });
+
+  const executePipeline = async () => {
+    setPipelineStatus('executing');
+    setTimeout(() => {
+      setPipelineStatus('ready');
+      setTelemetry(prev => ({ ...prev, requests: prev.requests + 1 }));
+    }, 600);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#080c18] text-slate-100 p-6">
+      <header className="flex justify-between items-center pb-4 border-b border-white/10">
+        <h1 className="text-xl font-extrabold text-white">KinetixOS</h1>
+        <button onClick={executePipeline} className="bg-amber-500 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs">
+          {pipelineStatus === 'executing' ? 'Processing...' : 'Run Pipeline'}
+        </button>
+      </header>
+      <main className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-slate-900/60 p-5 rounded-xl border border-white/10">
+          <div className="text-xs font-bold text-slate-400">Requests Processed</div>
+          <div className="text-3xl font-black text-cyan-400 mt-2">{telemetry.requests}</div>
+        </div>
+        <div className="bg-slate-900/60 p-5 rounded-xl border border-white/10">
+          <div className="text-xs font-bold text-slate-400">Avg Response Time</div>
+          <div className="text-3xl font-black text-amber-400 mt-2">{telemetry.avgLatency}</div>
+        </div>
+        <div className="bg-slate-900/60 p-5 rounded-xl border border-white/10">
+          <div className="text-xs font-bold text-slate-400">ROI</div>
+          <div className="text-3xl font-black text-emerald-400 mt-2">{telemetry.costSavings}</div>
+        </div>
+      </main>
+    </div>
+  );
+}
