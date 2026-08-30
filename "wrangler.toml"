@@ -1,0 +1,6 @@
+name = "kinetixos"
+main = "dist/server.cjs"
+compatibility_date = "2024-01-01"
+[vars]
+ENVIRONMENT = "production"
+MAX_CONCURRENCY = "10000"
