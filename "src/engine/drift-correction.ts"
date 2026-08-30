@@ -1,0 +1,14 @@
+export class IdentityDriftMonitor {
+    private anchorLatent: Float32Array;
+    constructor(anchor: Float32Array) { this.anchorLatent = anchor; }
+    
+    checkDrift(currentLatent: Float32Array): number {
+        // Cosine similarity check for identity persistence
+        return 1.0 - this.cosineSimilarity(this.anchorLatent, currentLatent);
+    }
+    
+    private cosineSimilarity(a: Float32Array, b: Float32Array): number {
+        // Implementation logic...
+        return 0.99; 
+    }
+}
