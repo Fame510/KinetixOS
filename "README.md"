@@ -1,7 +1,58 @@
-# KinetixOS: The Sovereign Cinema Engine
+# KinetixOS (OmniCinema AI Engine)
 
-A superior, zero-drift AI video generation platform.
-## Technical Moat
-- **Identity Consistency:** Latent-space tracking via `drift-correction.ts`.
-- **Edge Rendering:** WebGPU-accelerated interpolation in the browser.
-- **Monetization:** MCP-ready LoRA registry.
+> Autonomous, zero-drift AI video studio & character motion generation engine. Built to eliminate cloud GPU latency tax and enforce strict character identity preservation across multi-scene arcs.
+
+---
+
+## ⚡ Core Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      Kinetix Studio UI                      │
+│   - Multi-shot timeline editor                              │
+│   - 3D Catmull-Rom camera trajectory spline controller      │
+│   - Real-time WebGPU canvas preview                         │
+└──────────────────────────────┬──────────────────────────────┘
+                               │
+                ┌──────────────┴──────────────┐
+                ▼                             ▼
+┌──────────────────────────────┐┌──────────────────────────────┐
+│   Client Compute (WebGPU)    ││    Edge Orchestrator (API)   │
+│ - Zero-Drift Latent Anchor   ││ - Fastify/Express Router     │
+│ - Optical Flow Frame Interp  ││ - Multi-LoRA Weight Fusion   │
+│ - WebGL/WebGPU Compute pass  ││ - Stripe Revenue Settlement  │
+└──────────────────────────────┘└──────────────┬───────────────┘
+                                               ▼
+                                ┌──────────────────────────────┐
+                                │ PostgreSQL Sovereign Schema  │
+                                │ - LoRA Marketplace (85/15)   │
+                                │ - Provenance Hash Ledger     │
+                                └──────────────────────────────┘
+```
+
+---
+
+## 🔬 Technical Differentiators vs. Higgsfield AI
+
+| Feature | Higgsfield AI | KinetixOS |
+| :--- | :--- | :--- |
+| **Identity Drift** | Uncontrolled latent drift across cuts | **Anchor Tensor Cosine Verification (P99 > 0.94)** |
+| **Camera Controls** | Text-prompt approximate vectors | **Exact 3D Catmull-Rom Spline Keyframing (XYZ + Pitch/Yaw/Roll)** |
+| **Compute Overhead** | 100% Server GPU cloud farm ($$$) | **Hybrid WebGPU Client Interpolation + Distributed Edge** |
+| **Monetization** | Closed creator system | **Open LoRA Registry with 85/15 Instant Escrow Split** |
+| **Automation** | Web UI Only | **Headless MCP Server & REST API** |
+
+---
+
+## 🛠️ Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Start local studio
+npm run dev
+
+# Build edge bundle
+npm run build
+```
