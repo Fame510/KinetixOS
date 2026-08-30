@@ -1,0 +1,4 @@
+import { IdentityDriftMonitor } from './engine/drift-correction';
+import { GPUInterpolationEngine } from '../server/compute/gpu-interp';
+
+console.log("KinetixOS Sovereign Core Initialized.");
