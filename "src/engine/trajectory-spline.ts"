@@ -1,0 +1,77 @@
+/**
+ * KinetixOS 3D Trajectory Spline Engine
+ * Catmull-Rom 3D Spline interpolation for exact cinematic camera paths.
+ */
+
+export interface Vector3D {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export interface CameraKeyframe {
+  timestampMs: number;
+  position: Vector3D;
+  target: Vector3D;
+  fov: number;
+}
+
+export class CatmullRomSpline3D {
+  private keyframes: CameraKeyframe[];
+
+  constructor(keyframes: CameraKeyframe[]) {
+    if (keyframes.length < 2) {
+      throw new Error("At least 2 keyframes required for spline interpolation.");
+    }
+    this.keyframes = [...keyframes].sort((a, b) => a.timestampMs - b.timestampMs);
+  }
+
+  private interpolate(p0: number, p1: number, p2: number, p3: number, t: number): number {
+    const t2 = t * t;
+    const t3 = t2 * t;
+    return 0.5 * (
+      (2 * p1) +
+      (-p0 + p2) * t +
+      (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 +
+      (-p0 + 3 * p1 - 3 * p2 + p3) * t3
+    );
+  }
+
+  public sampleAtTime(timestampMs: number): CameraKeyframe {
+    const minTime = this.keyframes[0].timestampMs;
+    const maxTime = this.keyframes[this.keyframes.length - 1].timestampMs;
+    const clampedTime = Math.max(minTime, Math.min(maxTime, timestampMs));
+
+    // Find segment
+    let index = 0;
+    for (let i = 0; i < this.keyframes.length - 1; i++) {
+      if (clampedTime >= this.keyframes[i].timestampMs && clampedTime <= this.keyframes[i + 1].timestampMs) {
+        index = i;
+        break;
+      }
+    }
+
+    const k0 = this.keyframes[Math.max(0, index - 1)];
+    const k1 = this.keyframes[index];
+    const k2 = this.keyframes[Math.min(this.keyframes.length - 1, index + 1)];
+    const k3 = this.keyframes[Math.min(this.keyframes.length - 1, index + 2)];
+
+    const segmentDuration = k2.timestampMs - k1.timestampMs || 1;
+    const t = (clampedTime - k1.timestampMs) / segmentDuration;
+
+    return {
+      timestampMs: clampedTime,
+      position: {
+        x: this.interpolate(k0.position.x, k1.position.x, k2.position.x, k3.position.x, t),
+        y: this.interpolate(k0.position.y, k1.position.y, k2.position.y, k3.position.y, t),
+        z: this.interpolate(k0.position.z, k1.position.z, k2.position.z, k3.position.z, t)
+      },
+      target: {
+        x: this.interpolate(k0.target.x, k1.target.x, k2.target.x, k3.target.x, t),
+        y: this.interpolate(k0.target.y, k1.target.y, k2.target.y, k3.target.y, t),
+        z: this.interpolate(k0.target.z, k1.target.z, k2.target.z, k3.target.z, t)
+      },
+      fov: k1.fov + (k2.fov - k1.fov) * t
+    };
+  }
+}
