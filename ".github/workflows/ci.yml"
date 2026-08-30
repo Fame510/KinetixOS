@@ -1,0 +1,16 @@
+name: Autonomous Enterprise Production CI/CD
+on:
+  push:
+    branches: [main]
+jobs:
+  build-and-ship:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run build
+      - name: Deploy to Edge
+        run: npx wrangler deploy --compatibility-date 2024-01-01
