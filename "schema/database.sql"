@@ -1,0 +1,17 @@
+CREATE TABLE IF NOT EXISTS accounts (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  subscription_tier TEXT DEFAULT 'pro',
+  mrr NUMERIC DEFAULT 199.00,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+  id TEXT PRIMARY KEY,
+  account_id TEXT REFERENCES accounts(id),
+  action TEXT NOT NULL,
+  status TEXT NOT NULL,
+  execution_time_ms NUMERIC,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
