@@ -1,14 +1,82 @@
+/**
+ * KinetixOS Zero-Drift Identity Correction Engine
+ * Enforces latent-space invariant locking across multi-scene generative sequences.
+ */
+
+export interface DriftEvaluationResult {
+  isConsistent: boolean;
+  score: number; // 0.0 to 1.0 (Cosine Similarity)
+  driftDelta: number;
+  remediationVector?: Float32Array;
+}
+
 export class IdentityDriftMonitor {
-    private anchorLatent: Float32Array;
-    constructor(anchor: Float32Array) { this.anchorLatent = anchor; }
-    
-    checkDrift(currentLatent: Float32Array): number {
-        // Cosine similarity check for identity persistence
-        return 1.0 - this.cosineSimilarity(this.anchorLatent, currentLatent);
+  private anchorVector: Float32Array;
+  private readonly threshold: number;
+
+  constructor(anchorVector: Float32Array, toleranceThreshold: number = 0.92) {
+    if (anchorVector.length === 0) {
+      throw new Error("Anchor vector cannot be empty.");
     }
-    
-    private cosineSimilarity(a: Float32Array, b: Float32Array): number {
-        // Implementation logic...
-        return 0.99; 
+    this.anchorVector = this.normalizeTensor(anchorVector);
+    this.threshold = toleranceThreshold;
+  }
+
+  /**
+   * Normalizes vector to unit length (L2-norm)
+   */
+  private normalizeTensor(v: Float32Array): Float32Array {
+    let sumSq = 0;
+    for (let i = 0; i < v.length; i++) {
+      sumSq += v[i] * v[i];
     }
+    const norm = Math.sqrt(sumSq) || 1.0;
+    const normalized = new Float32Array(v.length);
+    for (let i = 0; i < v.length; i++) {
+      normalized[i] = v[i] / norm;
+    }
+    return normalized;
+  }
+
+  /**
+   * Calculates cosine similarity between anchor and candidate latent state.
+   */
+  public calculateCosineSimilarity(candidate: Float32Array): number {
+    if (candidate.length !== this.anchorVector.length) {
+      throw new Error(`Dimension mismatch: expected ${this.anchorVector.length}, received ${candidate.length}`);
+    }
+    const normalizedCandidate = this.normalizeTensor(candidate);
+    let dotProduct = 0;
+    for (let i = 0; i < this.anchorVector.length; i++) {
+      dotProduct += this.anchorVector[i] * normalizedCandidate[i];
+    }
+    return Math.max(0, Math.min(1.0, dotProduct));
+  }
+
+  /**
+   * Evaluates if latent drift has violated facial/identity integrity.
+   * Synthesizes an algebraic steering remediation tensor if drift occurs.
+   */
+  public evaluateDrift(candidateLatent: Float32Array): DriftEvaluationResult {
+    const similarity = this.calculateCosineSimilarity(candidateLatent);
+    const driftDelta = 1.0 - similarity;
+    const isConsistent = similarity >= this.threshold;
+
+    if (isConsistent) {
+      return { isConsistent: true, score: similarity, driftDelta };
+    }
+
+    // Synthesize steering projection tensor to snap latent back to anchor subspace
+    const remediationVector = new Float32Array(this.anchorVector.length);
+    for (let i = 0; i < this.anchorVector.length; i++) {
+      remediationVector[i] = 0.7 * this.anchorVector[i] + 0.3 * candidateLatent[i];
+    }
+
+    return {
+      isConsistent: false,
+      score: similarity,
+      driftDelta,
+      remediationVector: this.normalizeTensor(remediationVector)
+    };
+  }
 }
